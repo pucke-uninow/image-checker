@@ -89,6 +89,9 @@ async function run() {
             core.debug(`YAML file: ${JSON.stringify(yamlFile)}`);
             core.debug(`Result: ${JSON.stringify(result)}`);
         }
+        if (result.some(row => row[1].data === '❌')) {
+            core.setFailed('One or more images are not found');
+        }
         await core.summary
             .addHeading('Image validation results')
             .addTable([

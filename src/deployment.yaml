@@ -12,5 +12,5 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: ghcr.io/uninow/scraping/scraping:v1.104.1
+        - image: ghcr.io/uninow/scraping/scraping:v2.0.0
           name: scraping
