@@ -5,6 +5,7 @@ on: # rebuild any PRs and main branch changes
     branches:
       - main
       - 'releases/*'
+      - develop
 
 jobs:
   build: # make sure build/ci work properly
@@ -19,6 +20,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
+      - name: Get changed files
+        id: files
+        run: echo "::set-output name=paths::$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)"
+      - name: Check image existence
+        uses: pucke-uninow/image-checker@v0.0.2
         with:
-          milliseconds: 1000
+          token: ${{ secrets.GITHUB_TOKEN }}
+          paths: ${{ steps.files.outputs.paths }}
