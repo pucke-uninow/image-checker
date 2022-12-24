@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scraping
+  template:
+    metadata:
+      labels:
+        app: scraping
+    spec:
+      restartPolicy: Always
+      containers:
+        - image: ghcr.io/uninow/scraping/scraping:v1.104.1
+          name: scraping
