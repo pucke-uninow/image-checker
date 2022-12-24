@@ -1,24 +1,21 @@
 name: 'build-test'
 on: # rebuild any PRs and main branch changes
   pull_request:
-  push:
     branches:
       - main
-      - 'releases/*'
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./
         with:
-          milliseconds: 1000
+          fetch-depth: 0
+      - name: Get changed files
+        id: files
+        run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+      - name: Check image existence
+        uses: pucke-uninow/image-checker@v0.0.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          paths: ${{ steps.files.outputs.PATHS }}

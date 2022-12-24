@@ -74,13 +74,16 @@ async function run() {
             for (const container of (_d = (_c = (_b = (_a = yamlFile === null || yamlFile === void 0 ? void 0 : yamlFile.spec) === null || _a === void 0 ? void 0 : _a.template) === null || _b === void 0 ? void 0 : _b.spec) === null || _c === void 0 ? void 0 : _c.containers) !== null && _d !== void 0 ? _d : []) {
                 const { org, repo, imageName, tag } = parseImageString(container === null || container === void 0 ? void 0 : container.image);
                 const url = buildRegistryQueryUrl(org, repo, imageName, tag);
-                const encodedToken = new Buffer(token).toString('base64');
+                const encodedToken = Buffer.from(token).toString('base64');
                 const response = await httpClient.get(url, {
                     Authorization: `Bearer ${encodedToken}`
                 });
                 result.push([
-                    { data: container === null || container === void 0 ? void 0 : container.image },
-                    { data: response.message.statusCode === 200 ? '✅' : '❌' }
+                    { data: container === null || container === void 0 ? void 0 : container.image, header: false },
+                    {
+                        data: response.message.statusCode === 200 ? '✅' : '❌',
+                        header: false
+                    }
                 ]);
             }
             core.debug(`YAML file: ${JSON.stringify(yamlFile)}`);
