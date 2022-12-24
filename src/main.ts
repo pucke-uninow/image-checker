@@ -54,7 +54,7 @@ async function run(): Promise<void> {
       return
     }
 
-    const pathsArray = paths.split('\n')
+    const pathsArray = paths.split(' ')
 
     const result: SummaryTableCell[][] = []
 
@@ -67,7 +67,8 @@ async function run(): Promise<void> {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const yamlFile: any = yaml.load(file)
 
-      for (const container of yamlFile?.spec?.template?.spec?.containers) {
+      for (const container of yamlFile?.spec?.template?.spec?.containers ??
+        []) {
         const {org, repo, imageName, tag} = parseImageString(container?.image)
 
         const url = buildRegistryQueryUrl(org, repo, imageName, tag)
