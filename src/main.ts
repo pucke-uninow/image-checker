@@ -54,11 +54,14 @@ async function run(): Promise<void> {
       return
     }
 
-    const pathsArray = JSON.parse(paths)
+    const pathsArray = paths.split('\n')
 
     const result: SummaryTableCell[][] = []
 
     for (const path of pathsArray) {
+      if (!(path.includes('.yaml') || path.includes('.yml'))) {
+        continue
+      }
       const file = fs.readFileSync(path, {encoding: 'utf8'})
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
