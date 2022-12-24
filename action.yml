@@ -1,11 +1,13 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'image-checker'
+description: 'Check for existence of a given image'
+author: 'Philipp Ucke'
 inputs:
-  milliseconds: # change this
+  paths:
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'paths to check'
+  token:
+    required: true
+    description: 'github token'
 runs:
   using: 'node16'
   main: 'dist/index.js'
