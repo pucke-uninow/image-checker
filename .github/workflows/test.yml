@@ -15,7 +15,7 @@ jobs:
         id: files
         run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
       - name: Check image existence
-        uses: pucke-uninow/image-checker@v0.0.3
+        uses: pucke-uninow/image-checker@v0.0.4
         with:
           token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
           paths: ${{ steps.files.outputs.PATHS }}
