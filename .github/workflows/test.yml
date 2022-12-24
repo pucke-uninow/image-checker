@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        fetch-depth: 2
       - name: Get changed files
         id: files
-        run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT HEAD | xargs)" >> $GITHUB_OUTPUT
-      - run: echo "$(git diff --name-only --diff-filter=ACMRT HEAD | xargs)" >> $GITHUB_STEP_SUMMARY
+        run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT main | xargs)" >> $GITHUB_OUTPUT
+      - run: echo "$(git diff --name-only --diff-filter=ACMRT main | xargs)" >> $GITHUB_STEP_SUMMARY
       - name: Check image existence
         uses: pucke-uninow/image-checker@v0.0.2
         with:
