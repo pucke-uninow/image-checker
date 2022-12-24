@@ -73,15 +73,18 @@ async function run(): Promise<void> {
 
         const url = buildRegistryQueryUrl(org, repo, imageName, tag)
 
-        const encodedToken = new Buffer(token).toString('base64')
+        const encodedToken = Buffer.from(token).toString('base64')
 
         const response = await httpClient.get(url, {
           Authorization: `Bearer ${encodedToken}`
         })
 
         result.push([
-          {data: container?.image},
-          {data: response.message.statusCode === 200 ? '✅' : '❌'}
+          {data: container?.image, header: false},
+          {
+            data: response.message.statusCode === 200 ? '✅' : '❌',
+            header: false
+          }
         ])
       }
 
