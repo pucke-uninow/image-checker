@@ -50,7 +50,7 @@ function parseImageString(image) {
     return { org, repo, imageName, tag };
 }
 async function run() {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     try {
         const token = core.getInput('token');
         if (!token) {
@@ -62,7 +62,7 @@ async function run() {
             core.setFailed('No paths provided');
             return;
         }
-        const pathsArray = paths.split('\n');
+        const pathsArray = paths.split(' ');
         const result = [];
         for (const path of pathsArray) {
             if (!(path.includes('.yaml') || path.includes('.yml'))) {
@@ -71,7 +71,7 @@ async function run() {
             const file = fs_1.default.readFileSync(path, { encoding: 'utf8' });
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const yamlFile = js_yaml_1.default.load(file);
-            for (const container of (_c = (_b = (_a = yamlFile === null || yamlFile === void 0 ? void 0 : yamlFile.spec) === null || _a === void 0 ? void 0 : _a.template) === null || _b === void 0 ? void 0 : _b.spec) === null || _c === void 0 ? void 0 : _c.containers) {
+            for (const container of (_d = (_c = (_b = (_a = yamlFile === null || yamlFile === void 0 ? void 0 : yamlFile.spec) === null || _a === void 0 ? void 0 : _a.template) === null || _b === void 0 ? void 0 : _b.spec) === null || _c === void 0 ? void 0 : _c.containers) !== null && _d !== void 0 ? _d : []) {
                 const { org, repo, imageName, tag } = parseImageString(container === null || container === void 0 ? void 0 : container.image);
                 const url = buildRegistryQueryUrl(org, repo, imageName, tag);
                 const encodedToken = new Buffer(token).toString('base64');
