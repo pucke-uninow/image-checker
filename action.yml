@@ -1,6 +1,9 @@
 name: 'image-checker'
 description: 'Check for existence of a given image'
 author: 'Philipp Ucke'
+branding:
+  color: yellow
+  icon: alert-octagon
 inputs:
   paths:
     required: true
