@@ -14,5 +14,11 @@ spec:
       containers:
         - image: ghcr.io/supabase/studio:20221222-6b98c06
           name: supabase-studio
-        - image: ghcr.io/supabase/studio:00000000-0000000
+        - image: ghcr.io/supabase/studio:00000000-0000001
+          name: invalid-supabase-studio
+        - image: ghcr.io/supabase/studio:20221222-6b98c06
+          name: supabase-studio
+        - image: ghcr.io/supabase/studio:00000000-0000002
+          name: invalid-supabase-studio
+        - image: ghcr.io/supabase/studio:00000000-0000003
           name: invalid-supabase-studio
