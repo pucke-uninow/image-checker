@@ -4,13 +4,15 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: scraping
+      app: example-images
   template:
     metadata:
       labels:
-        app: scraping
+        app: example-images
     spec:
       restartPolicy: Always
       containers:
-        - image: ghcr.io/uninow/scraping/scraping:v2.0.1
-          name: scraping
+        - image: ghcr.io/supabase/studio:20221222-6b98c06
+          name: supabase-studio
+        - image: ghcr.io/supabase/studio:00000000-0000000
+          name: invalid-supabase-studio

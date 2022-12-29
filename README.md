@@ -1,105 +1,75 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+ # Image Checker Action
 
-# Create a JavaScript Action using TypeScript
+A GitHub Action to verify all the images and ensure they exist in the **ghcr.io registry**.
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+## Usage
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
-
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
-
-## Create an action from this template
-
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Main
-
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
-
-Install the dependencies  
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
+To use this action, add the following to your .github/workflows/main.yml file:
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+jobs:
+  image_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: pucke-uninow/image-checker@v1
+        with:
+          token: # Github token
+          paths: # File paths to check
 ```
 
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
+## Inputs
 
-## Usage:
+- `token` : Github token, used to authenticate against the GitHub API. **Required**.
+- `paths` : File paths to check. **Required**.
+ 
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+## Outputs
+The action writes the following to the action summary:
+
+<h1>Image validation results</h1>
+<table>
+    <tr>
+        <th>Image</th>
+        <th>Result</th>
+    </tr>
+    <tr>
+        <td>ghcr.io/supabase/studio:20221222-6b98c06</td>
+        <td>✅</td>
+    </tr>
+    <tr>
+        <td>ghcr.io/supabase/studio:00000000-0000000</td>
+        <td>❌</td>
+    </tr>
+</table>
+
+## Complete Example
+
+```yaml
+name: 'your-beutiful-workflow'
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  image-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Get changed files
+        id: files
+        run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
+      
+      - name: Check image existence
+        uses: pucke-uninow/image-checker@v0.0.4
+        with:
+          token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
+          paths: ${{ steps.files.outputs.PATHS }}
+```
+
+## License
+
+This action is licensed under the MIT License.
