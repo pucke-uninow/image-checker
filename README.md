@@ -66,7 +66,7 @@ jobs:
       - name: Check image existence
         uses: pucke-uninow/image-checker@v0.0.4
         with:
-          token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           paths: ${{ steps.files.outputs.PATHS }}
 ```
 
