@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "image-checker",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "This GitHub Action checks for the existence of images in yaml files.",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
