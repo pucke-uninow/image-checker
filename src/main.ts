@@ -7,7 +7,7 @@ import yaml from 'js-yaml'
 const httpClient = new HttpClient()
 
 export const IMAGE_REGEX =
-  /ghcr\.io\/(?<org>\w+)\/?(?<repo>\w+)?\/(?<imageName>\w+):(?<tag>.*)/
+  /ghcr\.io\/(?<org>[\w\-\.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/
 
 export function buildRegistryQueryUrl(
   org: string,
