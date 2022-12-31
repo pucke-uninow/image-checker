@@ -1,6 +1,6 @@
  # Image Checker Action
 
-A GitHub Action to verify all the images and ensure they exist in the **ghcr.io registry**.
+A GitHub Action to verify images and ensure they exist in the **ghcr.io registry**.
 
 ## Usage
 
