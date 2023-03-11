@@ -1,29 +1,91 @@
-import {wait} from '../src/wait'
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
-import {expect, test} from '@jest/globals'
+import {expect, it} from '@jest/globals'
+import {
+  buildRegistryQueryUrl,
+  checkImageManifest,
+  parseImageString
+} from '../src/main'
 
-test('throws invalid number', async () => {
-  const input = parseInt('foo', 10)
-  await expect(wait(input)).rejects.toThrow('milliseconds not a number')
+const {GITHUB_TOKEN = ''} = process.env
+it.each([
+  [
+    'ghcr.io/supabase/supabase/studio:20221222-6b98c06',
+    {
+      org: 'supabase',
+      repo: 'supabase',
+      imageName: 'studio',
+      tag: '20221222-6b98c06'
+    }
+  ],
+  [
+    'ghcr.io/supabase/studio:20221222-6b98c06',
+    {
+      org: 'supabase',
+      repo: null,
+      imageName: 'studio',
+      tag: '20221222-6b98c06'
+    }
+  ],
+  [
+    'ghcr.io/uninow/scraping/scraping:v1.104.2',
+    {
+      org: 'uninow',
+      repo: 'scraping',
+      imageName: 'scraping',
+      tag: 'v1.104.2'
+    }
+  ]
+])('parse %p expecting %p', async (input, expectedOutput) => {
+  const output = parseImageString(input)
+
+  expect(output.org).toEqual(expectedOutput.org)
+  expect(output.repo).toEqual(expectedOutput.repo)
+  expect(output.imageName).toEqual(expectedOutput.imageName)
+  expect(output.tag).toEqual(expectedOutput.tag)
 })
 
-test('wait 500 ms', async () => {
-  const start = new Date()
-  await wait(500)
-  const end = new Date()
-  var delta = Math.abs(end.getTime() - start.getTime())
-  expect(delta).toBeGreaterThan(450)
-})
+it.each([
+  [
+    {
+      org: 'supabase',
+      repo: null,
+      imageName: 'studio',
+      tag: '20221222-6b98c06'
+    },
+    200
+  ],
+  [
+    {
+      org: 'supabase',
+      repo: 'supabase',
+      imageName: 'studio',
+      tag: '0000000-000000'
+    },
+    404
+  ],
+  [
+    {
+      org: 'uninow',
+      repo: 'scraping',
+      imageName: 'scraping',
+      tag: 'v1.104.2'
+    },
+    200
+  ],
+  [
+    {
+      org: 'uninow',
+      repo: 'scraping',
+      imageName: 'scraping',
+      tag: 'v3.0.0'
+    },
+    404
+  ]
+])(
+  'check manifest for %p expecting %p',
+  async ({org, repo, imageName, tag}, expectedStatusCode) => {
+    const url = buildRegistryQueryUrl(org, repo, imageName, tag)
+    const response = await checkImageManifest(url, GITHUB_TOKEN)
 
-// shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  process.env['INPUT_MILLISECONDS'] = '500'
-  const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileSyncOptions = {
-    env: process.env
+    expect(response.message.statusCode).toEqual(expectedStatusCode)
   }
-  console.log(cp.execFileSync(np, [ip], options).toString())
-})
+)

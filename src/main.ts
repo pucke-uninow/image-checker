@@ -1,26 +1,28 @@
 import * as core from '@actions/core'
-import {HttpClient} from '@actions/http-client'
+import {HttpClient, HttpClientResponse} from '@actions/http-client'
 import {SummaryTableCell} from '@actions/core/lib/summary'
 import fs from 'fs'
 import yaml from 'js-yaml'
 
 const httpClient = new HttpClient()
 
-const IMAGE_REGEX =
-  /ghcr\.io\/(?<org>\w+)\/(?<repo>\w+)\/(?<imageName>\w+):(?<tag>.*)/
+export const IMAGE_REGEX =
+  /ghcr\.io\/(?<org>\w+)\/?(?<repo>\w+)?\/(?<imageName>\w+):(?<tag>.*)/
 
-function buildRegistryQueryUrl(
+export function buildRegistryQueryUrl(
   org: string,
-  repo: string,
+  repo: string | null,
   imageName: string,
   tag: string
 ): string {
-  return `https://ghcr.io/v2/${org}/${repo}/${imageName}/manifests/${tag}`
+  return `https://ghcr.io/v2/${org}${
+    repo ? `/${repo}` : ''
+  }/${imageName}/manifests/${tag}`
 }
 
-function parseImageString(image: string): {
+export function parseImageString(image: string): {
   org: string
-  repo: string
+  repo: string | null
   imageName: string
   tag: string
 } {
@@ -30,12 +32,23 @@ function parseImageString(image: string): {
     groups: {org, repo, imageName, tag}
   } = image.match(IMAGE_REGEX)
 
-  if (!org || !repo || !imageName || !tag) {
+  if (!org || !imageName || !tag) {
     core.setFailed(`Could not parse Image string: ${image}`)
     return {org: '', repo: '', imageName: '', tag: ''}
   }
 
-  return {org, repo, imageName, tag}
+  return {org, repo: repo ?? null, imageName, tag}
+}
+
+export async function checkImageManifest(
+  url: string,
+  token: string
+): Promise<HttpClientResponse> {
+  const encodedToken = Buffer.from(token).toString('base64')
+
+  return httpClient.get(url, {
+    Authorization: `Bearer ${encodedToken}`
+  })
 }
 
 async function run(): Promise<void> {
@@ -73,11 +86,7 @@ async function run(): Promise<void> {
 
         const url = buildRegistryQueryUrl(org, repo, imageName, tag)
 
-        const encodedToken = Buffer.from(token).toString('base64')
-
-        const response = await httpClient.get(url, {
-          Authorization: `Bearer ${encodedToken}`
-        })
+        const response = await checkImageManifest(url, token)
 
         result.push([
           {data: container?.image, header: false},

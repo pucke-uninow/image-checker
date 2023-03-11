@@ -1,11 +1,23 @@
-name: 'build-test'
+name: 'Test'
 on: # rebuild any PRs and main branch changes
   pull_request:
     branches:
       - main
 
 jobs:
-  test: # make sure the action works on a clean machine without building
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - run: npm ci
+      - run: npm run test
+        env:
+          GITHUB_TOKEN: ${{ secrets.UNINOW_GITHUB_TOKEN }}
+
+  action-test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +27,7 @@ jobs:
         id: files
         run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
       - name: Check image existence
-        uses: pucke-uninow/image-checker@v0.0.4
+        uses: pucke-uninow/image-checker@v0.1.0
         with:
-          token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           paths: ${{ steps.files.outputs.PATHS }}
