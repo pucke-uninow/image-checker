@@ -39,7 +39,7 @@ const http_client_1 = __nccwpck_require__(6255);
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const js_yaml_1 = __importDefault(__nccwpck_require__(1917));
 const httpClient = new http_client_1.HttpClient();
-exports.IMAGE_REGEX = /ghcr\.io\/(?<org>[\w\-\.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/;
+exports.IMAGE_REGEX = /ghcr\.io\/(?<org>[\w\-.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/;
 function buildRegistryQueryUrl(org, repo, imageName, tag) {
     return `https://ghcr.io/v2/${org}${repo ? `/${repo}` : ''}/${imageName}/manifests/${tag}`;
 }
@@ -86,6 +86,9 @@ async function run() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const yamlFile = js_yaml_1.default.load(file);
             for (const container of (_d = (_c = (_b = (_a = yamlFile === null || yamlFile === void 0 ? void 0 : yamlFile.spec) === null || _a === void 0 ? void 0 : _a.template) === null || _b === void 0 ? void 0 : _b.spec) === null || _c === void 0 ? void 0 : _c.containers) !== null && _d !== void 0 ? _d : []) {
+                if (/ghcr\.io/.test(container === null || container === void 0 ? void 0 : container.image)) {
+                    continue;
+                }
                 const { org, repo, imageName, tag } = parseImageString(container === null || container === void 0 ? void 0 : container.image);
                 const url = buildRegistryQueryUrl(org, repo, imageName, tag);
                 const response = await checkImageManifest(url, token);
@@ -1849,6 +1852,10 @@ function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
+    }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
@@ -1874,13 +1881,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
