@@ -82,6 +82,10 @@ async function run(): Promise<void> {
 
       for (const container of yamlFile?.spec?.template?.spec?.containers ??
         []) {
+        if (/ghcr\.io/.test(container?.image)) {
+          continue
+        }
+
         const {org, repo, imageName, tag} = parseImageString(container?.image)
 
         const url = buildRegistryQueryUrl(org, repo, imageName, tag)
