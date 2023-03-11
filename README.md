@@ -1,6 +1,6 @@
  # Image Checker Action
 
-A GitHub Action to verify all the images and ensure they exist in the **ghcr.io registry**.
+A GitHub Action to verify images and ensure they exist in the **ghcr.io registry**.
 
 ## Usage
 
@@ -66,7 +66,7 @@ jobs:
       - name: Check image existence
         uses: pucke-uninow/image-checker@v0.0.4
         with:
-          token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           paths: ${{ steps.files.outputs.PATHS }}
 ```
 

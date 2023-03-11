@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3.6.0
         with:
           node-version: '16'
       - run: npm ci
@@ -27,7 +27,7 @@ jobs:
         id: files
         run: echo "PATHS=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | xargs)" >> $GITHUB_OUTPUT
       - name: Check image existence
-        uses: pucke-uninow/image-checker@v0.1.0
+        uses: pucke-uninow/image-checker@v0.1.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.UNINOW_GITHUB_TOKEN }}
           paths: ${{ steps.files.outputs.PATHS }}

@@ -39,7 +39,7 @@ const http_client_1 = __nccwpck_require__(6255);
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const js_yaml_1 = __importDefault(__nccwpck_require__(1917));
 const httpClient = new http_client_1.HttpClient();
-exports.IMAGE_REGEX = /ghcr\.io\/(?<org>\w+)\/?(?<repo>\w+)?\/(?<imageName>\w+):(?<tag>.*)/;
+exports.IMAGE_REGEX = /ghcr\.io\/(?<org>[\w\-\.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/;
 function buildRegistryQueryUrl(org, repo, imageName, tag) {
     return `https://ghcr.io/v2/${org}${repo ? `/${repo}` : ''}/${imageName}/manifests/${tag}`;
 }
