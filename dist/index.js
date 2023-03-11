@@ -86,6 +86,9 @@ async function run() {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const yamlFile = js_yaml_1.default.load(file);
             for (const container of (_d = (_c = (_b = (_a = yamlFile === null || yamlFile === void 0 ? void 0 : yamlFile.spec) === null || _a === void 0 ? void 0 : _a.template) === null || _b === void 0 ? void 0 : _b.spec) === null || _c === void 0 ? void 0 : _c.containers) !== null && _d !== void 0 ? _d : []) {
+                if (/ghcr\.io/.test(container === null || container === void 0 ? void 0 : container.image)) {
+                    continue;
+                }
                 const { org, repo, imageName, tag } = parseImageString(container === null || container === void 0 ? void 0 : container.image);
                 const url = buildRegistryQueryUrl(org, repo, imageName, tag);
                 const response = await checkImageManifest(url, token);
