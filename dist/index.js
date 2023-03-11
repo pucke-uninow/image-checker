@@ -39,7 +39,7 @@ const http_client_1 = __nccwpck_require__(6255);
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const js_yaml_1 = __importDefault(__nccwpck_require__(1917));
 const httpClient = new http_client_1.HttpClient();
-exports.IMAGE_REGEX = /ghcr\.io\/(?<org>[\w\-\.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/;
+exports.IMAGE_REGEX = /ghcr\.io\/(?<org>[\w\-.]*)\/?(?<repo>.*)?\/(?<imageName>.+):(?<tag>.*)/;
 function buildRegistryQueryUrl(org, repo, imageName, tag) {
     return `https://ghcr.io/v2/${org}${repo ? `/${repo}` : ''}/${imageName}/manifests/${tag}`;
 }
@@ -1852,6 +1852,10 @@ function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
+    }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
@@ -1877,13 +1881,24 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
